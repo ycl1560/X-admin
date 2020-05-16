@@ -1,0 +1,139 @@
+<!doctype html>
+<html class="x-admin-sm">
+<head>
+    <meta charset="UTF-8">
+    <title>贵工程就业信息系统</title>
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link rel="stylesheet" href="./css/font.css">
+    <link rel="stylesheet" href="./lib/layui/css/layui.css"  media="all">
+    <!--<link rel="stylesheet" href="./css/xadmin.css">-->
+    <link rel="stylesheet" href="./css/index.css">
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <!-- <link rel="stylesheet" href="./css/theme5.css"> -->
+    <script src="./lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/xadmin.js"></script>
+    <!-- <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>-->
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <script>
+        // 是否开启刷新记忆tab功能
+        var is_remember = false;
+    </script>
+</head>
+<body class="index" style="background-color: white">
+<!-- 顶部开始 -->
+<div class="" style="margin-left:0;margin-right: 0;width: auto;height: auto;background-color: #3C6ABD">
+    <div class="allpage" style="margin-left:20%;margin-right: 20%;width: auto;height: auto;background-color: #3C6ABD">
+        <img src="images/logo.png" href="./index.html">
+
+    </div>
+        <ul class="daohang" style="font-size: 5px">
+            <li><a href="./index.html">
+                首页
+            </a>
+            </li>
+            <li><a href="javascript:notice();">公告信息</a></li>
+            <li><a href="javascript:worknotice();">工作动态</a></li>
+            <li><a href="javascript:job();">招聘信息</a></li>
+            <li><a href="./login.html">用户登录</a></li>
+            <li><a href="javascript:jos();" onclick="xadmin.open('单位注册','./unitUserManageHtml/member-add.html',600,400);">单位注册</a></li>
+        </ul>
+
+
+    <div class="" style="width: auto;height: auto">
+        <iframe src='./body.html' name="contentpage"   frameborder="0" scrolling="yes" class="x-iframe" style="width: 100%;height: 1000px"></iframe>
+    </div>
+
+</div>
+<div class="layui-footer" style="background-color: #3C6ABD;height: 150px;color: white;font-size: 15px;text-align: center;margin-top: 0">
+    <div class="layui-main">
+        <div class="site-union">
+            <p class="site-union-desc">
+                        <span>
+                          联系我们：<a style="color: white">15454545454</a>
+                        </span>
+            </p>
+        </div>
+
+        <div class="site-union">
+            <p class="site-union-desc">
+                        <span>
+                          地址：<a style="color: white">贵州省毕节市七星关区学院路贵州工程应用技术学院大学生就业指导中心</a>
+                        </span>
+            </p>
+        </div>
+
+        <div class="site-union">
+            <p class="site-union-desc">
+                        <span>
+                          邮编：<a style="color: white">551700</a>
+                        </span>
+            </p>
+        </div>
+        <div class="site-union">
+            <p class="site-union-desc">
+                        <span>
+                          就业咨询电话：<a style="color: white">0857-8330279</a>
+                        </span>
+            </p>
+        </div>
+        <div class="site-union">
+            <p class="site-union-desc">
+                        <span>
+                          版权所有：<a style="color: white">贵州工程应用技术学院</a>
+                        </span>
+            </p>
+        </div>
+
+    </div>
+
+</div>
+<!-- 顶部结束 -->
+<!-- 中部开始 -->
+<!-- 左侧菜单结束 -->
+
+<!-- <div style="">
+     <a>测试底部</a>
+ </div>-->
+<!-- <div class="page-content-bg"></div>-->
+<style id="theme_style"></style>
+<!-- 右侧主体结束 -->
+<!-- 中部结束 -->
+<script>
+    function notice () {
+        window.contentpage.location="./schoolNotice-list.html";
+    }
+    function worknotice () {
+        window.contentpage.location="./workNotice-list.html";
+    }
+    function job(){
+
+        window.contentpage.location="./indexJobLook.html";
+    }
+
+    //主页写入用户名
+        layui.use(['form','element','jquery','carousel','table'], function(){
+            //var userData = JSON.parse(sessionStorage.getItem('userData'));
+            var element = layui.element;
+            var table = layui.table;
+            var carousel = layui.carousel
+            var userData = layui.sessionData('userData');
+            var $ = layui.jquery
+            /*if(jQuery.isEmptyObject(userData)){
+                alert("请先登录！")
+                window.location="../login.html";
+            }*/
+            /* $("#username").text(userData.data.userName);*/
+            //获取所有专业信息
+        });
+
+</script>
+</body>
+
+</html>

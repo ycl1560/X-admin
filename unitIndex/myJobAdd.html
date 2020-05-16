@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+
+<head>
+    <meta charset="UTF-8">
+    <title>职位编辑</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="stylesheet" href="../css/font.css">
+    <link rel="stylesheet" href="../css/xadmin.css">
+    <script type="text/javascript" src="../lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="../js/xadmin.js"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="layui-fluid">
+    <div class="layui-row">
+        <form class="layui-form" >
+            <div class="layui-form-item">
+                <label for="jobName" class="layui-form-label">
+                    <span class="x-red">*</span>职位名称</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="jobName" name="jobName" required="" lay-verify="required" autocomplete="off" class="layui-input" ></div></div>
+
+
+            <div class="layui-form-item">
+                <label class="layui-form-label"><span class="x-red">*</span>工作类型</label>
+                <div class="layui-input-block">
+                    <select id="jobType" name="jobType" lay-filter="jobType" class="layui-form" lay-verify="jobType">
+                    </select>
+                </div>
+            </div>
+
+        <!--    <div class="layui-form-item">
+                <label for="jobYears" class="layui-form-label">工作年限</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="jobYears" name="jobYears" required="" lay-verify="" autocomplete="off" class="layui-input"></div>
+            </div>-->
+            <div class="layui-form-item">
+                <label for="jobMajor" class="layui-form-label">专业要求</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="jobMajor" name="jobMajor" required="" lay-verify="" autocomplete="off" class="layui-input"></div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label"><span class="x-red">*</span>性别要求</label>
+                <div class="layui-input-block">
+                    <select id="jobSex" name="jobSex" lay-filter="jobSex" class="layui-form" lay-verify="required">
+                    </select>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label for="age" class="layui-form-label">年龄要求</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="age" name="age" required="" lay-verify="" autocomplete="off" class="layui-input"></div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label"><span class="x-red">*</span>学历要求</label>
+                <div class="layui-input-block">
+                    <select id="academicQualifications" name="academicQualifications" lay-filter="academicQualifications" class="layui-form" lay-verify="required">
+                    </select>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label for="monthlySalary" class="layui-form-label">月薪</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="monthlySalary" name="monthlySalary" required="" lay-verify="" autocomplete="off" class="layui-input"></div>
+            </div>
+
+
+            <div class="layui-form-item">
+                <label for="recruitsNumber" class="layui-form-label">招聘人数</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="recruitsNumber" name="recruitsNumber" required="" lay-verify="number" autocomplete="off" class="layui-input"></div>
+            </div>
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">职位描述</label>
+                <div class="layui-input-block">
+                    <textarea placeholder="请输入内容" class="layui-textarea"  id="detail" name="detail"></textarea>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label for="submit" class="layui-form-label"></label>
+                <button class="layui-btn" lay-filter="add" lay-submit="" id="submit">提交</button></div>
+        </form>
+    </div>
+</div>
+<script>
+    layui.use(['form', 'layer','jquery'],
+        function() {
+            $ = layui.jquery;
+            var form = layui.form,
+                layer = layui.layer;
+            //列表页传过来的职位信息
+            var unitInfo = layui.sessionData("userData").data
+            var userId = unitInfo.userId
+            var jobType = "全职";
+            var jobSex;
+            var academicQualifications = "不限";
+
+            /*  form.on('radio(radio)', function(data){
+                  //console.log(data.elem); //得到radio原始DOM对象
+                  sex = data.value; //被点击的radio的value值
+                  console.log(sex)
+              });*/
+            var jobTypeHtml
+            if(jobType=="实习"){
+                jobTypeHtml = "<option value='"+"实习"+"' selected='selected'>"+"实习"+"</option>"
+                    +"<option value='"+"全职"+"'>"+"全职"+"</option>"+"</option>"
+                    +"<option value='"+"兼职"+"'>"+"兼职"+"</option>"
+            }
+            else if(jobType=="兼职"){
+                jobTypeHtml ="<option value='"+"兼职"+"' selected='selected'>"+"兼职"+"</option>"+"</option>"
+                    +"<option value='"+"实习"+"' >"+"实习"+"</option>"
+                    +"<option value='"+"全职"+"'>"+"全职"+"</option>"
+            }
+            else {
+                jobTypeHtml ="<option value='"+"全职"+"' selected='selected'>"+"全职"+"</option>"+"</option>"
+                    +"<option value='"+"兼职"+"' >"+"兼职"+"</option>"
+                    +"<option value='"+"实习"+"'>"+"实习"+"</option>"
+            }
+
+            var sexhtml
+            if(jobSex=="男"){
+                sexhtml = "<option value='"+"男"+"' selected='selected'>"+"男"+"</option>"+
+                    "<option value='"+"女"+"'>"+"女"+"</option>"
+                    +"<option value='"+"不限"+"'>"+"不限"+"</option>"
+            }
+            else if(jobSex=="女"){
+                sexhtml = "<option value='"+"女"+"'+selected='selected'>"+"女"+"</option>"
+                    +"<option value='"+"男"+"'>"+"男"+"</option>"
+                    +"<option value='"+"不限"+"'>"+"不限"+"</option>"
+            }
+            else {
+                sexhtml = "<option value='"+"不限"+"'>"+"不限"+"</option>"
+                    +"<option value='"+"女"+"'>"+"女"+"</option>"
+                    +"<option value='"+"男"+"'>"+"男"+"</option>"
+            }
+
+            var academicQualificationshtml;
+            if(academicQualifications=="专科及以上"){
+                academicQualificationshtml = "<option value='"+"专科及以上"+"' selected='selected'>"+"专科及以上"
+                    +"</option>"+"<option value='"+"本科及以上"+"'>"+"本科及以上"+"</option>"
+                    +"</option>"+"<option value='"+"硕士及以上"+"'>"+"硕士及以上"+"</option>"
+                    +"</option>"+"<option value='"+"博士"+"'>"+"博士"+"</option>"
+                    +"</option>"+"<option value='"+"不限"+"'>"+"不限"+"</option>"
+            }
+            else if(academicQualifications=="本科及以上"){
+                academicQualificationshtml = "<option value='"+"本科及以上"+"' selected='selected'>"+"本科及以上"
+                    +"</option>"+"<option value='"+"专科及以上"+"'>"+"专科及以上"+"</option>"
+                    +"</option>"+"<option value='"+"硕士及以上"+"'>"+"硕士及以上"+"</option>"
+                    +"</option>"+"<option value='"+"博士"+"'>"+"博士"+"</option>"
+                    +"</option>"+"<option value='"+"不限"+"'>"+"不限"+"</option>"
+            }
+            else if(academicQualifications=="硕士及以上"){
+                academicQualificationshtml = "<option value='"+"硕士及以上"+"' selected='selected'>"+"硕士及以上"
+                    +"</option>"+"<option value='"+"专科及以上"+"'>"+"专科及以上"+"</option>"
+                    +"</option>"+"<option value='"+"本科及以上"+"'>"+"本科及以上"+"</option>"
+                    +"</option>"+"<option value='"+"博士及以上"+"'>"+"博士及以上"+"</option>"
+                    +"</option>"+"<option value='"+"不限"+"'>"+"不限"+"</option>"
+            }else if(academicQualifications=="博士及以上"){
+                academicQualificationshtml = "<option value='"+"博士及以上"+"' selected='selected'>"+"博士及以上"
+                    +"</option>"+"<option value='"+"专科及以上"+"'>"+"专科及以上"+"</option>"
+                    +"</option>"+"<option value='"+"本科及以上"+"'>"+"本科及以上"+"</option>"
+                    +"</option>"+"<option value='"+"硕士及以上"+"'>"+"硕士及以上"+"</option>"
+                    +"</option>"+"<option value='"+"不限"+"'>"+"不限"+"</option>"
+            }else{
+                academicQualificationshtml = "<option value='"+"不限"+"' selected='selected'>"+"不限"
+                    +"</option>"+"<option value='"+"专科及以上"+"'>"+"专科及以上"+"</option>"
+                    +"</option>"+"<option value='"+"本科及以上"+"'>"+"本科及以上"+"</option>"
+                    +"</option>"+"<option value='"+"硕士及以上"+"'>"+"硕士及以上"+"</option>"
+                    +"</option>"+"<option value='"+"博士及以上"+"'>"+"博士及以上"+"</option>"
+            }
+
+            $("#jobSex").html(sexhtml);
+            $("#jobType").html(jobTypeHtml);
+            $("#academicQualifications").html(academicQualificationshtml);
+            form.render("select");
+
+            //监听工作类型选择
+            form.on('select(jobType)', function(data){
+                jobType = data.value;
+            })
+
+            //监听工作性别选择
+            form.on('select(jobSex)', function(data){
+                jobSex = data.value;
+            })
+            //监听学历选择
+            form.on('select(academicQualifications)', function(data){
+                academicQualifications = data.value;
+            })
+
+            //监听提交
+            form.on('submit(add)',
+                function(data) {
+                    /*    var employmentInfoEditData = layui.sessionData("employmentInfoEditData").data;
+                        var jobId = employmentInfoEditData.jobId;
+                        var jobMajor = employmentInfoEditData.jobMajor;
+                        var jobYears = employmentInfoEditData.jobYears;
+                        var jobType = employmentInfoEditData.jobType;
+                        var jobName = employmentInfoEditData.jobName;
+                        var unitName = employmentInfoEditData.unitName;
+                        var age = employmentInfoEditData.age;
+                        var jobSex = employmentInfoEditData.jobSex;
+                        var academicQualifications = employmentInfoEditData.academicQualifications;
+                        var monthlySalary = employmentInfoEditData.monthlySalary;
+                        var recruitsNumber = employmentInfoEditData.recruitsNumber;*/
+                    var jobName = $("#jobName").val()
+                  /*  var jobYears = $("#jobYears").val()*/
+                    var jobMajor = $("#jobMajor").val()
+                    var monthlySalary = $("#monthlySalary").val()
+                    var recruitsNumber = $("#recruitsNumber").val()
+                    var detail = $("#detail").val()
+                    var age = $("#age").val();
+                    $.ajax({
+                        url: "http://127.0.0.1:8080/addJob",
+                        dataType: "json",
+                        async:true,
+                        type: "post",
+                        contentType:"application/json;charset=UTF-8",
+                        data:JSON.stringify({
+                            userId:userId,
+                            jobName:jobName,
+                            jobType:jobType,
+                       /*     jobYears:jobYears,*/
+                            jobMajor:jobMajor,
+                            jobSex:jobSex,
+                            age:age,
+                            academicQualifications:academicQualifications,
+                            monthlySalary:monthlySalary,
+                            recruitsNumber:recruitsNumber,
+                            jobDetail:detail
+                        }),
+                        success:function (data) {
+                            if (data.msg=='OK') {
+                                console.log(data);
+                                //发异步，把数据提交给php
+                                layer.alert("添加成功", {
+                                        icon: 6
+                                    },
+                                    function() {
+                                        //关闭当前frame
+                                        xadmin.close();
+
+                                        // 可以对父窗口进行刷新
+                                        xadmin.father_reload();
+
+                                    });
+                            }else  {
+                                alert("请检查后台！");
+                            }
+                        },
+                        error:function (arg) {
+                            layer.alert("添加失败！");
+                        }
+                    })
+
+                    return false;
+                });
+
+        });</script>
+</body>
+
+</html>

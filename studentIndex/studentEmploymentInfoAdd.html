@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+
+<head>
+    <meta charset="UTF-8">
+    <title>职位编辑</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="stylesheet" href="../css/font.css">
+    <link rel="stylesheet" href="../css/xadmin.css">
+    <script type="text/javascript" src="../lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="../js/xadmin.js"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="layui-fluid">
+    <div class="layui-row">
+        <form class="layui-form" >
+            <div class="layui-form-item">
+                <label for="jobName" class="layui-form-label">
+                    <span class="x-red">*</span>职位名称</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="jobName" name="jobName" required="" lay-verify="required" autocomplete="off" class="layui-input" >
+                </div>
+            </div>
+
+            <div class="layui-inline">
+                <label class="layui-form-label">就业日期</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="date" id="employmentTime" lay-verify="employmentTime" placeholder="yyyy-MM-dd" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+
+<!--
+            <div class="layui-form-item">
+                <label class="layui-form-label"><span class="x-red">*</span>工作类型</label>
+                <div class="layui-input-block">
+                    <select id="jobType" name="jobType" lay-filter="jobType" class="layui-form" lay-verify="jobType">
+                    </select>
+                </div>
+            </div>-->
+            <div class="layui-form-item">
+                <label class="layui-form-label"><span class="x-red">*</span>就业省份</label>
+                <div class="layui-input-block">
+                    <select id="employmentProvence" name="employmentProvence" lay-filter="employmentProvence" class="layui-form" lay-verify="username">
+                    </select>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label"><span class="x-red">*</span>月收入</label>
+                <div class="layui-input-block">
+                    <select id="monthlySalary" name="sex" lay-filter="monthlySalary" class="layui-form" lay-verify="username">
+                    </select>
+                </div>
+            </div>
+           <!-- <div class="layui-form-item">
+                <label for="industry" class="layui-form-label">
+                    行业</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="industry" name="industry" required="" lay-verify="" autocomplete="off" class="layui-input" ></div>
+            </div>-->
+            <div class="layui-upload">
+                <label for="uploadimg" class="layui-form-label">
+                    <span class="x-red">*</span>就业表/劳动合同上传</label>
+                <button type="button" class="layui-btn" id="uploadimg">上传图片</button>
+                <div class="layui-upload-list">
+                    <img class="layui-upload-img" id="img">
+                    <p id="imgsrc"></p>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label for="submit" class="layui-form-label"></label>
+                <button class="layui-btn" lay-filter="add" lay-submit="" id="submit">提交</button></div>
+        </form>
+    </div>
+</div>
+<script>
+    layui.use(['form', 'layer','jquery' , 'layedit', 'laydate','upload'],
+        function() {
+            $ = layui.jquery;
+            var form = layui.form,
+                layer = layui.layer,
+                laydate = layui.laydate,
+                upload = layui.upload;
+            var userData = layui.sessionData("userData").data;
+            var userId = userData.userId;
+            $.ajax({
+                url: "http://127.0.0.1:8080/getEmploymentByInfo?userId="+userId,
+                dataType: "json",
+                async:true,
+                type: "get",
+                contentType:"application/json;charset=UTF-8",
+                success:function (data) {
+                    if (data.msg=='OK') {
+                        layui.sessionData('employmentInfoEditData',{
+                            key:'data',
+                            value:data.data[0]
+                        });
+                    }else  {
+                        alert("请检查后台！");
+                    }
+                },
+                error:function (arg) {
+                    layer.alert("查询职位失败！");
+                }
+            })
+            //普通图片上传
+            var uploadInst = upload.render({
+                elem: '#uploadimg'
+                ,url: 'http://127.0.0.1:8080/uploadImg' //改成您自己的上传接口
+                ,auto: false //选择文件后不自动上传
+                ,before: function(obj){
+                    //预读本地文件示例，不支持ie8
+                    obj.preview(function(index, file, result){
+                        $('#img').attr('src', result); //图片链接（base64）
+                    });
+                }
+                ,choose: function(obj){  //上传前选择回调方法
+                    var flag = true;
+                    obj.preview(function(index, file, result){
+                        console.log(file);            //file表示文件信息，result表示文件src地址
+                        var img = new Image();
+                        img.src = result;
+                        img.onload = function () { //初始化夹在完成后获取上传图片宽高，判断限制上传图片的大小。
+                            if(img.width ==1000 && img.height ==750){
+                                obj.upload(index, file); //满足条件调用上传方法
+                            }else{
+                                flag = false;
+                                layer.msg("您上传的小图大小必须是像素1000*750px尺寸）！");
+                                return false;
+                            }
+                        }
+                        return flag;
+                    });
+                }
+                ,done: function(res){
+                    //如果上传失败
+                    if(res.code > 0){
+                        return layer.msg('图片上传失败');
+                    }
+                    //上传成功
+                    layer.msg('图片上传成功');
+                    $("#imgsrc").val(res.data) ;
+                    }
+                ,error: function(){
+                    //演示失败状态，并实现重传
+                    var imgsrc = $('#imgsrc');
+                    imgsrc.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+                    imgsrc.find('.demo-reload').on('click', function(){
+                        uploadInst.upload();
+                    });
+                }
+            });
+            laydate.render({
+                elem: '#employmentTime'
+            });
+         /*   //获取省份
+            $.ajax({
+                url: "http://127.0.0.1:8080/getAllProvince",
+                dataType: "json",
+                async:true,
+                type: "get",
+                contentType:"application/json;charset=UTF-8",
+                success:function (data) {
+                    if (data.msg=='OK') {
+                        layui.sessionData('provinceData',{
+                            key:'data',
+                            value:data.data
+                        });
+                    }else  {
+                        alert("请检查后台服务器");
+                    }
+                },
+                error:function (arg) {
+                    layer.alert("查看失败！");
+                }
+            });
+*/
+            var employmentInfoEditData = layui.sessionData("employmentInfoEditData").data;
+            var provinceData = layui.sessionData("provinceData").data;
+            var jobName
+            var employmentProvence
+            var employmentTime
+            var monthlySalary
+            var employmentTablePath
+            var provinceId
+            var employmentId
+            console.log(employmentInfoEditData)
+            if(employmentInfoEditData!=undefined){
+                jobName = employmentInfoEditData.jobName;
+                employmentProvence = employmentInfoEditData.employmentProvence;
+                employmentTime = employmentInfoEditData.employmentTime;
+                monthlySalary = employmentInfoEditData.monthlySalary;
+                employmentTablePath = employmentInfoEditData.employmentTablePath;
+                provinceId = employmentInfoEditData.provinceId;
+                employmentId = employmentInfoEditData.employmentId;
+                $("#jobName").val(jobName)
+                $("#employmentTime").val(employmentTime)
+                $("#imgsrc").val(employmentTablePath)
+            }
+
+
+            console.log(employmentTablePath)
+            var provincehtml;
+            //遍历根据后台返回省份赋予其他省份选择框
+            for(var i=0;i<provinceData.length;i++){
+                if(provinceData[i].province==employmentProvence){
+                    provincehtml =  "<option value='"+provinceData[i].id+"' selected='selected'>"+provinceData[i].province+"</option>"
+                    for(var j=0;j<provinceData.length;j++){
+                        if(provinceData[j]==employmentProvence){
+                        }
+                        else {
+                            provincehtml += "<option value='"+provinceData[j].id+"'>"+provinceData[j].province+"</option>"
+                        }
+                    }
+                }
+                else {
+                    provincehtml =  "<option value='"+provinceData[i].id+"' selected='selected'>"+provinceData[i].province+"</option>"
+                    for(var j=0;j<provinceData.length;j++){
+                        if(provinceData[j]==employmentProvence){
+                        }
+                        else {
+                            provincehtml += "<option value='"+provinceData[j].id+"'>"+provinceData[j].province+"</option>"
+                        }
+                    }
+                }
+            }
+            $("#employmentProvence").html(provincehtml);
+            var monthSalaryArr = ["0-2K","2-4K","4-6K","6-8K","8-10K","10K+"]
+            var monthSalaryArrhtml
+            //遍历根据后台返回薪资赋予其他自定义薪资选择框
+            for(var i=0;i<monthSalaryArr.length;i++){
+                if(monthSalaryArr[i]==monthlySalary){
+                    console.log(monthlySalary)
+                    monthSalaryArrhtml =  "<option value='"+monthSalaryArr[i]+"' selected='selected'>"+monthSalaryArr[i]+"</option>"
+                    for(var j=0;j<monthSalaryArr.length;j++){
+                        if(monthSalaryArr[j]==monthlySalary){
+                        }
+                        else {
+                            monthSalaryArrhtml += "<option value='"+monthSalaryArr[j]+"'>"+monthSalaryArr[j]+"</option>"
+                        }
+                    }
+                    break;
+                }
+                else {
+                    monthSalaryArrhtml =  "<option value='"+monthSalaryArr[i]+"' selected='selected'>"+monthSalaryArr[i]+"</option>"
+                    for(var j=0;j<monthSalaryArr.length;j++){
+                        if(monthSalaryArr[j]==monthlySalary){
+                        }
+                        else {
+                            monthSalaryArrhtml += "<option value='"+monthSalaryArr[j]+"'>"+monthSalaryArr[j]+"</option>"
+                        }
+                    }
+                }
+            }
+            $("#monthlySalary").html(monthSalaryArrhtml);
+            form.render("select");
+
+            //监听省份选择
+            form.on('select(employmentProvence)', function(data){
+                employmentProvence = data.value;
+                console.log(employmentProvence)
+            })
+
+
+            //监听工资选择
+            form.on('select(monthlySalary)', function(data){
+                monthlySalary = data.value;
+            })
+
+            //监听提交
+            form.on('submit(add)',
+                function(data) {
+                    jobName = $("#jobName").val()
+                    employmentProvence = $("#employmentProvence").val()
+                    monthlySalary = $("#monthlySalary").val()
+                    employmentTime = $("#employmentTime").val()
+                    employmentTablePath = $("#imgsrc").val()
+                    $.ajax({
+                        url: "http://127.0.0.1:8080/addEmployment",
+                        dataType: "json",
+                        async:true,
+                        type: "post",
+                        contentType:"application/json;charset=UTF-8",
+                        data:JSON.stringify({
+                            employmentId:employmentId,
+                            userId:userId,
+                            jobName:jobName,
+                            employmentProvence:employmentProvence,
+                            monthlySalary:monthlySalary,
+                            employmentTime:employmentTime,
+                            employmentTablePath:employmentTablePath,
+                        }),
+                        success:function (data) {
+                            if (data.msg=='OK') {
+                                console.log(data);
+                                //发异步，把数据提交给php
+                                layer.alert("填报成功", {
+                                        icon: 6
+                                    },
+                                    function() {
+                                    //查询更新用户就业信息
+                                        $.ajax({
+                                            url: "http://127.0.0.1:8080/getEmploymentByInfo?userId="+userId,
+                                            dataType: "json",
+                                            async:true,
+                                            type: "get",
+                                            contentType:"application/json;charset=UTF-8",
+                                            success:function (data) {
+                                                if (data.msg=='OK') {
+                                                    layui.sessionData('employmentInfoEditData',{
+                                                        key:'data',
+                                                        value:data.data[0]
+                                                    });
+                                                }else  {
+                                                    alert("请检查后台！");
+                                                }
+                                            },
+                                            error:function (arg) {
+                                                layer.alert("填报失败！");
+                                            }
+                                        })
+                                        //关闭当前frame
+                                        xadmin.close();
+                                        // 可以对父窗口进行刷新
+                                  window.location.reload()
+
+                                    });
+                            }else  {
+                                alert("请检查后台！");
+                            }
+                        },
+                        error:function (arg) {
+                            layer.alert("填报失败！");
+                        }
+                    })
+
+                    return false;
+                });
+
+        });</script>
+</body>
+
+</html>

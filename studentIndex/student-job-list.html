@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+    <head>
+        <meta charset="UTF-8">
+        <title>职位列表</title>
+        <meta name="renderer" content="webkit">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+        <link rel="stylesheet" href="../css/font.css">
+        <link rel="stylesheet" href="../css/xadmin.css">
+        <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+        <script src="../lib/layui/layui.js" charset="utf-8"></script>
+        <script type="text/javascript" src="../js/xadmin.js"></script>
+        <!--[if lt IE 9]>
+          <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+          <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+    </head>
+    <body>
+        <div class="x-nav">
+          <span class="layui-breadcrumb">
+            <a>
+              <cite>导航元素</cite></a>
+          </span>
+          <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" onclick="location.reload()" title="刷新">
+            <i class="layui-icon layui-icon-refresh" style="line-height:30px"></i></a>
+        </div>
+        <div class="layui-fluid">
+            <div class="layui-row layui-col-space15">
+                <div class="layui-col-md12">
+                    <div class="layui-card" style="text-align:center;">
+                        <div class="layui-inline" style="">
+                            <div><a style="color: #1E9FFF;font-size:30px" id="name"></a></div>
+                        </div>
+                        <div style="margin-top: 20px">
+                            <div>&nbsp;&nbsp;&nbsp;&nbsp;<a style="font-size: 15px">公司地址:</a>
+                                <a style="font-size: 15px" id="adress"></a>
+                                &nbsp;&nbsp;&nbsp;&nbsp;<a style="font-size: 15px">法人代表:</a>
+                                <a style="font-size: 15px" id="legalrepresentative"></a>
+                            </div>
+                        </div>
+                        <div style="margin-top: 20px">
+                            <div>&nbsp;&nbsp;&nbsp;&nbsp;<a style="font-size: 15px">电话:</a>
+                                <a style="font-size: 15px" id="phonenumber"></a>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a style="font-size: 15px">所属行业:</a>
+                                <a style="font-size: 15px" id="industry"></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-card">
+                        <div class="layui-card-body" style="text-align: center;">
+                            <form class="layui-form layui-col-space5">
+                                <div class="layui-inline layui-show-xs-block">
+                                    <input type="text" name="jobName" id="jobName"  placeholder="职位名称" autocomplete="off" class="layui-input">
+                                </div>
+                                <div class="layui-inline layui-show-xs-block">
+                                    <button class="layui-btn"  lay-submit="" lay-filter="sreach"><i class="layui-icon">&#xe615;</i></button>
+                                </div>
+                            </form>
+                        </div>
+                        <div style="text-align: center">
+                            <div class="layui-inline" >
+                                <table class="layui-table layui-form" id="userTable" lay-filter="userTable" style="margin:0 auto;">
+
+                                </table>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script type="text/html" id="bar">
+        <button class="layui-btn layui-btn-normal" lay-event="look">查看</button>
+    </script>
+    <script type="text/html" id="bar2">
+        <button class="layui-btn layui-btn-normal" lay-event="attention">投递</button>
+    </script>
+    <script>
+      layui.use('table', function(){
+          var userData = layui.sessionData('userData');
+          if(jQuery.isEmptyObject(userData)){
+              alert("请先登录！")
+              window.location="../login.html";
+          }
+        var laydate = layui.laydate;
+        var  form = layui.form;
+          var table = layui.table;
+          var data = layui.sessionData('jobLookData');
+          var userId = data.data.userId;
+          $.ajax({
+              url: "http://127.0.0.1:8080/getUserById?userId="+userId,
+              dataType: "json",
+              async:true,
+              type: "post",
+              contentType:"application/json;charset=UTF-8",
+              success:function (data) {
+                  if (data.msg=='OK') {
+                      $("#name").text(data.data.name)
+                      $("#adress").text(data.data.institutionAddress)
+                      $("#legalrepresentative").text(data.data.legalRepresentative)
+                      $("#phonenumber").text(data.data.phonenumber)
+                      $("#industry").text(data.data.industry)
+                  }
+              },
+              error:function (arg) {
+                  layer.alert("获取单位信息失败！");
+              }
+          })
+
+          //生成表单
+          table.render({
+              elem: '#userTable'
+              ,height: 500
+              ,url: 'http://127.0.0.1:8080/getJobByJobNameOrUnitNameOrUserId?jobName='+''+'&unitName='+''+'&userId='+userId //数据接口
+              ,page: true //开启分页
+              ,limits: [5,10,20,50,100]
+              ,limit: 10 //每页默认显示的数量
+              ,response: {
+                  statusCode: 200//规定成功的状态码，默认：0
+                  ,msgName: 'msg' //规定状态信息的字段名称，默认：msg
+                  ,countName: 'count' //规定数据总数的字段名称，默认：count
+                  ,dataName: 'data' //规定数据列表的字段名称，默认：data
+              }
+              ,parseData:function (res) {
+                  return{
+                      "code": res.status, //解析接口状态
+                      "msg": res.message, //解析提示文本
+                      "count": res.count, //解析数据长度
+                      "data": res.data //解析数据列表
+                  };
+              }
+              ,cols: [[ //表头
+                  {field: 'jobId', title: '', width:100, sort: true, fixed: 'left',type:'space',hide:true}
+                  ,{field: 'jobDetail', title: '', width:100, sort: true, fixed: 'left',type:'space',hide:true}
+                  ,{field: 'monthlySalary', title: '', width:100, sort: true, fixed: 'left',type:'space',hide:true}
+                  ,{field: 'jobType', title: '职位类型', width:100,style:'background-color: #009688; color: #fff;',sort:true,fixed:"left",align:'center'}
+                  ,{field: 'jobName', title: '职位名称', width:130 ,align:'center'}
+                  ,{field: 'jobYears', title: '工作年限', width:80 ,align:'center'}
+                  ,{field: 'jobMajor', title: '专业要求', width:100,hide:true}
+                  ,{field: 'age', title: '年龄要求', width:80,align:'center'}
+                  ,{field: 'jobSex', title: '性别要求', width:80,align:'center'}
+                  ,{field: 'academicQualifications', title: '学历要求', width:130,align:'center'}
+                  ,{field: 'recruitsNumber', title: '招聘人数', width: 100,sort:true}
+                  ,{field: 'updateTime', title: '更新时间', width: 180,sort:true,align:'center'}
+                  ,{field: 'createTime', title: '创建时间', width: 180,sort:true,hide:true}
+                  ,{title: '操作', width: 100,toolbar:"#bar"}
+                  ,{title: '投递该职位', width: 200,toolbar:"#bar2",align:'center'}
+              ]]
+          });
+
+          //监听意向职位
+          var userData = layui.sessionData('userData');
+          var userDatauserId = userData.data.userId;
+          var jobId ;
+          //监听查询按钮提交
+          form.on('submit(sreach)',
+              function(data) {
+                  var jobName = $("#jobName").val()
+                 /* console.log("姓名"+name)
+                  console.log("学号"+sno)
+                  console.log("用户名"+userName)*/
+                  table.reload('userTable', {
+                      url: 'http://127.0.0.1:8080/getJobByJobNameOrUnitNameOrUserId' //数据接口
+                      ,where:{
+                          jobName:jobName,
+                          unitName:'',
+                          userId:userId
+                      }
+                      ,page: {
+                          curr: 1 //重新从第 1 页开始
+                      }
+                  }); //只重载数据
+
+                  return false;
+              });
+          //工具栏中编辑按钮监听
+          table.on('tool(userTable)', function(obj){
+              var data = obj.data;
+              if(obj.event === 'look'){
+                  layui.sessionData('jobDetailData',{
+                      key:'data',
+                      value:data
+                  })
+                  xadmin.open('查看职位','./jobDetail.html',800)
+              }
+              else  if(obj.event=='attention'){
+                  $.ajax({
+                      url: "http://127.0.0.1:8080/getResumesByUserId?userId="+userDatauserId,
+                      dataType: "json",
+                      async:true,
+                      type: "get",
+                      contentType:"application/json;charset=UTF-8",
+                      success:function (data) {
+                          if (data.data==undefined) {
+                                return layer.alert("请先完善个人简历！")
+                          }
+                          else {
+                              jobId = obj.data.jobId;
+                              $.ajax({
+                                  url: "http://127.0.0.1:8080/isStudentAttentionJob?jobId="+jobId+"&userId="+userDatauserId,
+                                  dataType: "json",
+                                  async:true,
+                                  type: "post",
+                                  contentType:"application/json;charset=UTF-8",
+                                  success:function (data) {
+                                      if (data.data=='exist') {
+                                          layer.alert("已投递过该职位！");
+                                      }else if(data.data=='no'){
+
+                                          $.ajax({
+                                              url: "http://127.0.0.1:8080/addStudentAttentionJobByUserIdAndJobId?jobId="+jobId+"&userId="+userDatauserId,
+                                              dataType: "json",
+                                              async:true,
+                                              type: "post",
+                                              contentType:"application/json;charset=UTF-8",
+                                              success:function (data) {
+                                                  if (data.msg=='OK') {
+                                                      console.log(data);
+                                                      //发异步，把数据提交给php
+                                                      layer.alert("添加求职成功", {
+                                                          icon: 6
+                                                      })
+                                                  }else  {
+                                                      layer.alert("添加求职失败！");
+                                                  }
+                                              },
+                                              error:function (arg) {
+                                                  layer.alert("添加求职失败！");
+                                              }
+                                          })
+                                      }
+                                      else  {
+                                          layer.alert("添加求职失败！");
+                                      }
+                                  },
+                                  error:function (arg) {
+                                      layer.alert("添加求职失败！");
+                                  }
+                              })
+                          }
+                      },
+                      error:function (arg) {
+                          layer.alert("获取简历信息失败！");
+                      }
+
+                  })
+
+
+              }
+          });
+
+
+      });
+
+      /*用户-删除*/
+      function member_del(obj,id){
+          layer.confirm('确认要删除吗？',function(index){
+              //发异步删除数据
+              $(obj).parents("tr").remove();
+              layer.msg('已删除!',{icon:1,time:1000});
+          });
+      }
+
+    </script>
+</html>

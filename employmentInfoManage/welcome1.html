@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+    <head>
+        <meta charset="UTF-8">
+        <title>就业数据统计</title>
+        <meta name="renderer" content="webkit">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+        <link rel="stylesheet" href="../css/font.css">
+        <link rel="stylesheet" href="../css/xadmin.css">
+        <script src="../lib/layui/layui.js" charset="utf-8"></script>
+        <script type="text/javascript" src="../js/xadmin.js"></script>
+        <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+        <!--[if lt IE 9]>
+          <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+          <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+
+        <![endif]-->
+    </head>
+    <body>
+        <div class="layui-fluid">
+            <div class="layui-row layui-col-space15">
+                <div class="layui-col-sm12 layui-col-md6">
+                    <div class="layui-card">
+                        <div class="layui-card-header">贵工程在各省份就业人数情况</div>
+                        <div class="layui-card-body" style="min-height: 280px;">
+                            <div id="main1" class="layui-col-sm12" style="height: 300px;"></div>
+
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="layui-col-sm12 layui-col-md6">
+                    <div class="layui-card">
+                        <div class="layui-card-header">贵工程学生就业薪资情况    人数/薪资</div>
+                        <div class="layui-card-body" style="min-height: 280px;">
+                            <div id="main2" class="layui-col-sm12" style="height: 300px;"></div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm12 layui-col-md6">
+                    <div class="layui-card">
+                        <div class="layui-card-header">系统现有数据情况</div>
+                        <div class="layui-card-body" style="min-height: 280px;">
+                            <div id="main3" class="layui-col-sm12" style="height: 300px;"></div>
+                        </div>
+                    </div>
+                </div>
+
+               <!-- <div class="layui-col-sm12 layui-col-md6">
+                    <div class="layui-card">
+                        <div class="layui-card-header">硬盘使用量</div>
+                        <div class="layui-card-body" style="min-height: 280px;">
+                            <div id="main4" class="layui-col-sm12" style="height: 300px;"></div>
+
+                        </div>
+                    </div>
+                </div>-->
+            </div>
+        </div>
+        </div>
+    
+        <script src="https://cdn.bootcss.com/echarts/4.2.1-rc1/echarts.min.js"></script>
+        <script type="text/javascript">
+            //省份统计
+            $.ajax({
+                url: "http://127.0.0.1:8080/getEmploymentPlaceInfo",
+                dataType: "json",
+                async:true,
+                type: "get",
+                contentType:"application/json;charset=UTF-8",
+                /*data:JSON.stringify({
+                    noticeName:noticeName,
+                    noticeDetail:noticeDetail,
+                    type:type
+                }),*/
+                success:function (data) {
+                    if (data.msg=='OK') {
+                        var provence = new Array();
+                        var dataValue = new Array();
+                        var myChart = echarts.init(document.getElementById('main1'));
+                        var option;
+                        for (var i=0;i<data.data.length;i++){
+                            provence[i] = data.data[i].name;
+                            dataValue[i] = data.data[i];
+                        }
+
+                        option = {
+                            tooltip : {
+                                trigger: 'item',
+                                formatter: "{a} <br/>{b} : {c} ({d}%)"
+                            },
+                            legend: {
+                                orient: 'vertical',
+                                left: 'left',
+                                data:provence
+                            },
+                            series : [
+                                {
+                                    name: '就业人数',
+                                    type: 'pie',
+                                    radius : '55%',
+                                    center: ['50%', '60%'],
+                                    data:dataValue,
+                                    itemStyle: {
+                                        emphasis: {
+                                            shadowBlur: 10,
+                                            shadowOffsetX: 0,
+                                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                        myChart.setOption(option);
+                        console.log(option)
+                    }
+                    else  {
+                        alert("请检查服务器");
+                    }
+                },
+                error:function (arg) {
+                    layer.alert("省份出错！");
+                }
+            })
+            //薪资统计
+            $.ajax({
+                url: "http://127.0.0.1:8080/getEmploymentSalaryInfo",
+                dataType: "json",
+                async:true,
+                type: "get",
+                contentType:"application/json;charset=UTF-8",
+                /*data:JSON.stringify({
+                    noticeName:noticeName,
+                    noticeDetail:noticeDetail,
+                    type:type
+                }),*/
+                success:function (data) {
+                    if (data.msg=='OK') {
+                        var myChart = echarts.init(document.getElementById('main2'));
+                        var option;
+                        var datamid=data.data;
+                        option = {
+                            color: ['#3398DB'],
+                            tooltip: {
+                                trigger: 'axis',
+                                axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+                                    type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                                }
+                            },
+                            grid: {
+                                left: '3%',
+                                right: '4%',
+                                bottom: '3%',
+                                containLabel: true
+                            },
+                            xAxis: [
+                                {
+                                    type: 'category',
+                                    data: [datamid[0].salary, datamid[1].salary, datamid[2].salary, datamid[3].salary, datamid[4].salary, datamid[5].salary]
+                                }
+                            ],
+                            yAxis: [
+                                {
+                                    type: 'value'
+                                }
+                            ],
+                            series: [
+                                {
+                                    name: '人数',
+                                    type: 'bar',
+                                    barWidth: '60%',
+                                    data: [datamid[0].value, datamid[1].value, datamid[2].value, datamid[3].value, datamid[4].value, datamid[5].value],
+                                }
+                            ]
+                        };
+                        myChart.setOption(option);
+                        console.log(option)
+                    }
+                    else  {
+                        alert("请检查服务器");
+                    }
+                },
+                error:function (arg) {
+                    layer.alert("省份出错！");
+                }
+            })
+            //系统数据统计
+            $.ajax({
+                url: "http://127.0.0.1:8080/getIndexStatistics",
+                dataType: "json",
+                async:true,
+                type: "get",
+                contentType:"application/json;charset=UTF-8",
+                /*data:JSON.stringify({
+                    noticeName:noticeName,
+                    noticeDetail:noticeDetail,
+                    type:type
+                }),*/
+                success:function (data) {
+                    if (data.msg=='OK') {
+                        var myChart = echarts.init(document.getElementById('main3'));
+                        var option;
+                        var datamid=data.data;
+                        option = {
+                            tooltip: {
+                                trigger: 'item',
+                                formatter: '{a} <br/>{b}: {c} ({d}%)'
+                            },
+                            legend: {
+                                orient: 'vertical',
+                                left: 10,
+                                data: ['系统用户', '职位数量', '通知公告数量']
+                            },
+                            series: [
+                                {
+                                    name: '数量',
+                                    type: 'pie',
+                                    radius: ['50%', '70%'],
+                                    avoidLabelOverlap: false,
+                                    label: {
+                                        show: false,
+                                        position: 'center'
+                                    },
+                                    emphasis: {
+                                        label: {
+                                            show: true,
+                                            fontSize: '30',
+                                            fontWeight: 'bold'
+                                        }
+                                    },
+                                    labelLine: {
+                                        show: false
+                                    },
+                                    data: [
+                                        {value: datamid.number_user, name: '系统用户'},
+                                        {value: datamid.number_job, name: '职位数量'},
+                                        {value: datamid.number_gonggao, name: '通知公告数量'}
+                                    ]
+                                }
+                            ]
+                        };
+                        myChart.setOption(option);
+                        console.log(option)
+                    }
+                    else  {
+                        alert("请检查服务器");
+                    }
+                },
+                error:function (arg) {
+                    layer.alert("省份出错！");
+                }
+            })
+
+      /*   // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('main4'));
+
+        // 指定图表的配置项和数据
+        var option = {
+            tooltip : {
+                formatter: "{a} <br/>{b} : {c}%"
+            },
+            series: [
+                {
+                    name: '硬盘使用量',
+                    type: 'gauge',
+                    detail: {formatter:'{value}%'},
+                    data: [{value: 88, name: '已使用'}]
+                }
+            ]
+        };
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);*/
+    </script>
+    </body>
+</html>

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+    <head>
+        <meta charset="UTF-8">
+        <title>欢迎页面-X-admin2.2</title>
+        <meta name="renderer" content="webkit">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+        <link rel="stylesheet" href="./css/font.css">
+        <link rel="stylesheet" href="./css/xadmin.css">
+        <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+        <script src="./lib/layui/layui.js" charset="utf-8"></script>
+        <script type="text/javascript" src="./js/xadmin.js"></script>
+        <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+        <!--[if lt IE 9]>
+          <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+          <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+    </head>
+    <body>
+        <div class="layui-fluid">
+            <div class="layui-row layui-col-space15">
+                <div class="layui-col-md12">
+                    <div class="layui-card">
+                        <div class="layui-card-body ">
+                            <blockquote class="layui-elem-quote">欢迎您：
+                                <span id="username" class="x-red"></span>！
+                            </blockquote>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-md12">
+                    <div class="layui-card">
+                        <div class="layui-card-header">数据统计</div>
+                        <div class="layui-card-body ">
+                            <ul class="layui-row layui-col-space10 layui-this x-admin-carousel x-admin-backlog">
+                                <li class="layui-col-md2 layui-col-xs6">
+                                    <a href="javascript:;" class="x-admin-backlog-body">
+                                        <h3>用户数</h3>
+                                        <p id="usernumber">
+                                            <cite>66</cite></p>
+                                    </a>
+                                </li>
+                                <li class="layui-col-md2 layui-col-xs6">
+                                    <a href="javascript:;" class="x-admin-backlog-body">
+                                        <h3>公告通知数</h3>
+                                        <p id="noticenumber">
+                                            <cite>12</cite></p>
+                                    </a>
+                                </li>
+                                <li class="layui-col-md2 layui-col-xs6">
+                                    <a href="javascript:;" class="x-admin-backlog-body">
+                                        <h3>职位数量</h3>
+                                        <p id="jobnumber">
+                                            <cite>99</cite></p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-md12">
+                    <div class="layui-card">
+                        <div class="layui-card-header">系统介绍</div>
+                        <div class="layui-card-body ">
+                            <table class="layui-table">
+                                <tbody>
+                                    <tr>
+                                        <th>版权所有</th>
+                                        <td>贵州工程应用技术学院
+                                            <a href="http://www.gues.edu.cn/" target="_blank">访问官网</a></td>
+                                    </tr>
+                                    <tr>
+                                        <th>开发者</th>
+                                        <td>杨春路(928238465@qq.com)</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <style id="welcome_style"></style>
+                <div class="layui-col-md12">
+                    <blockquote class="layui-elem-quote layui-quote-nm">贵州工程应用技术学院就业指导服务中心</blockquote></div>
+                </div>
+        </div>
+        </div>
+        <div class="layui-footer" style="background-color: #3C6ABD;height: 150px;color: white;font-size: 15px;text-align: center;margin-top: 200px">
+            <div class="layui-main">
+                <div class="site-union">
+                    <p class="site-union-desc">
+                        <span>
+                          联系我们：<a style="color: white">15454545454</a>
+                        </span>
+                    </p>
+                </div>
+
+                <div class="site-union">
+                    <p class="site-union-desc">
+                        <span>
+                          地址：<a style="color: white">贵州省毕节市七星关区学院路贵州工程应用技术学院大学生就业指导中心</a>
+                        </span>
+                    </p>
+                </div>
+
+                <div class="site-union">
+                    <p class="site-union-desc">
+                        <span>
+                          邮编：<a style="color: white">551700</a>
+                        </span>
+                    </p>
+                </div>
+                <div class="site-union">
+                    <p class="site-union-desc">
+                        <span>
+                          就业咨询电话：<a style="color: white">0857-8330279</a>
+                        </span>
+                    </p>
+                </div>
+                <div class="site-union">
+                    <p class="site-union-desc">
+                        <span>
+                          版权所有：<a style="color: white">贵州工程应用技术学院</a>
+                        </span>
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+    </body>
+<script>
+    var userData =JSON.parse(sessionStorage.getItem("userData"));
+    console.log(userData)
+    username.innerHTML = userData.data.name;
+    var usernumber = document.getElementById("usernumber");
+    var noticenumber = document.getElementById("noticenumber");
+    var jobnumber = document.getElementById("jobnumber");
+    $(function () {
+        $.ajax({
+            url: "http://127.0.0.1:8080/getIndexStatistics",
+            dataType: "json",
+            async:true,
+            type: "get",
+            contentType:"application/json;charset=UTF-8",
+            /* data:{
+                 userName:userName,
+                 password:password,
+                 institutionAddress:institutionAddress,
+                 name:name,
+                 legalRepresentative:legalRepresentative,
+                 industry:industry,
+                 phonenumber:phonenumber,
+                 type:3
+             },*/
+            success:function (data) {
+                console.log(data)
+                usernumber.innerHTML="<cite>"+data.data.number_user+"</cite>";
+                noticenumber.innerHTML="<cite>"+data.data.number_gonggao+"</cite>";
+                jobnumber.innerHTML="<cite>"+data.data.number_job+"</cite>";
+            },
+            error:function (arg) {
+                layer.alert("连接服务器失败！");
+            }
+        })
+    })
+</script>
+</html>

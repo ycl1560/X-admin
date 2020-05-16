@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+    <head>
+        <meta charset="UTF-8">
+        <title>教师用户管理</title>
+        <meta name="renderer" content="webkit">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+        <link rel="stylesheet" href="../css/font.css">
+        <link rel="stylesheet" href="../css/xadmin.css">
+        <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+        <script src="../lib/layui/layui.js" charset="utf-8"></script>
+        <script type="text/javascript" src="../js/xadmin.js"></script>
+        <!--[if lt IE 9]>
+          <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+          <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+    </head>
+    <body>
+        <div class="x-nav">
+          <span class="layui-breadcrumb">
+              <a><cite>导航元素</cite></a>
+          </span>
+          <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" onclick="location.reload()" title="刷新">
+            <i class="layui-icon layui-icon-refresh" style="line-height:30px"></i></a>
+        </div>
+        <div class="layui-fluid">
+            <div class="layui-row layui-col-space15">
+                <div class="layui-col-md12">
+                    <div class="layui-card">
+                        <div class="layui-card-body ">
+                            <form class="layui-form layui-col-space5">
+                                <div class="layui-inline layui-show-xs-block">
+                                    <input type="text" name="username" id="username"  placeholder="请输入用户名" autocomplete="off" class="layui-input">
+                                </div>
+                                <div class="layui-inline layui-show-xs-block">
+                                    <input type="text" name="name" id="name"  placeholder="请输入姓名" autocomplete="off" class="layui-input">
+                                </div>
+                                <div class="layui-inline layui-show-xs-block">
+                                    <input type="text" name="tno" id="tno"  placeholder="请输入教师号" autocomplete="off" class="layui-input">
+                                </div>
+                                <div class="layui-inline layui-show-xs-block">
+                                    <button class="layui-btn"  lay-submit="" lay-filter="sreach"><i class="layui-icon">&#xe615;</i></button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="layui-card-header demoTable">
+                            <button class="layui-btn layui-btn-danger" data-type="getCheckData"><i class="layui-icon"></i>批量删除</button>
+                            <button class="layui-btn layui-btn-normal" data-type="getCheckLength"><i class="layui-icon"></i>获取选中数目</button>
+                            <button class="layui-btn" onclick="xadmin.open('添加教师','./member-add.html',600,400)"><i class="layui-icon"></i>添加</button>
+                        </div>
+                        <div class="layui-card-body layui-table-body layui-table-main">
+                            <table class="layui-table layui-form" id="userTable" lay-filter="userTable">
+
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="layui-footer" style="background-color: #3C6ABD;height: 150px;color: white;font-size: 15px;text-align: center">
+                <div class="layui-main">
+                    <div class="site-union">
+                        <p class="site-union-desc">
+                        <span>
+                          联系我们：<a style="color: white">15454545454</a>
+                        </span>
+                        </p>
+                    </div>
+
+                    <div class="site-union">
+                        <p class="site-union-desc">
+                        <span>
+                          地址：<a style="color: white">贵州省毕节市七星关区学院路贵州工程应用技术学院大学生就业指导中心</a>
+                        </span>
+                        </p>
+                    </div>
+
+                    <div class="site-union">
+                        <p class="site-union-desc">
+                        <span>
+                          邮编：<a style="color: white">551700</a>
+                        </span>
+                        </p>
+                    </div>
+                    <div class="site-union">
+                        <p class="site-union-desc">
+                        <span>
+                          就业咨询电话：<a style="color: white">0857-8330279</a>
+                        </span>
+                        </p>
+                    </div>
+                    <div class="site-union">
+                        <p class="site-union-desc">
+                        <span>
+                          版权所有：<a style="color: white">贵州工程应用技术学院</a>
+                        </span>
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+        </div> 
+    </body>
+    <script type="text/html" id="bar">
+        <button class="layui-btn layui-btn-normal" lay-event="changepwd">修改密码</button>
+        <button class="layui-btn layui-btn-normal" lay-event="edit">编辑</button>
+        <button class="layui-btn layui-btn-danger"lay-event="delete">删除</button>
+    </script>
+    <script>
+      layui.use('table', function(){
+        var laydate = layui.laydate;
+        var  form = layui.form;
+          var table = layui.table;
+          var userData = layui.sessionData('userData');
+          if(jQuery.isEmptyObject(userData)){
+              alert("请先登录！")
+              window.location="../login.html";
+          }
+          //生成表单
+          table.render({
+              elem: '#userTable'
+              ,height: 500
+              ,url: 'http://127.0.0.1:8080/getAllTeacherUserInfo' //数据接口
+              ,page: true //开启分页
+              ,limits: [5,10,20,50,100]
+              ,limit: 10 //每页默认显示的数量
+              ,response: {
+                  statusCode: 200//规定成功的状态码，默认：0
+                  ,msgName: 'msg' //规定状态信息的字段名称，默认：msg
+                  ,countName: 'count' //规定数据总数的字段名称，默认：count
+                  ,dataName: 'data' //规定数据列表的字段名称，默认：data
+              }
+              ,parseData:function (res) {
+                  return{
+                      "code": res.status, //解析接口状态
+                      "msg": res.message, //解析提示文本
+                      "count": res.count, //解析数据长度
+                      "data": res.data //解析数据列表
+                  };
+              }
+              ,cols: [[ //表头
+                  {field: 'userId', title: 'ID', width:100, sort: true, fixed: 'left',type:'checkbox'}
+                  ,{field: 'tno', title: '教师号', width:180,style:'background-color: #009688; color: #fff;',sort:true,fixed:"left"}
+                  ,{field: 'userName', title: '用户名', width:130 }
+                  ,{field: 'type', title: '角色', width:100 }
+                  ,{field: 'name', title: '姓名', width:100}
+                  ,{field: 'sex', title: '性别', width:80}
+                  ,{field: 'phonenumber', title: '电话', width:130}
+                  ,{field: 'updateTime', title: '更新时间', width: 180,sort:true}
+                  ,{field: 'createTime', title: '创建时间', width: 180,sort:true}
+                  ,{title: '操作', width: 200,toolbar:"#bar"}
+              ]]
+          });
+          //监听查询按钮提交
+          form.on('submit(sreach)',
+              function(data) {
+                  var userName = $("#username").val()
+                  var name = $("#name").val()
+                  var tno = $("#tno").val()
+                 /* console.log("姓名"+name)
+                  console.log("学号"+sno)
+                  console.log("用户名"+userName)*/
+                  table.reload('userTable', {
+                      url: 'http://127.0.0.1:8080/getTeacherUserByInfo' //数据接口
+                      ,where:{
+                          userName:userName,
+                          tno:tno,
+                          name:name
+                      }
+                      ,page: {
+                          curr: 1 //重新从第 1 页开始
+                      }
+                  }); //只重载数据
+
+                  return false;
+              });
+          //工具栏中编辑删除按钮监听
+          table.on('tool(userTable)', function(obj){
+              var data = obj.data;
+              if(obj.event === 'edit'){
+                  layui.sessionData('userEditData',{
+                      key:'data',
+                      value:data
+                  })
+                  xadmin.open('编辑教师用户','./member-edit.html',600,400)
+                  layer.msg('编辑教师用户'+ data.userName);
+              } else if(obj.event === 'delete'){
+                  layer.confirm('真的删除用户吗？', function(index){
+                      $.ajax({
+                          url: "http://127.0.0.1:8080/delUserById?userId="+data.userId,
+                          dataType: "json",
+                          async:true,
+                          type: "post",
+                          contentType:"application/json;charset=UTF-8",
+                          /*
+                          data:JSON.stringify({
+
+                          }),*/
+                          success:function (data) {
+                              if (data.msg=='OK') {
+                                  console.log(data);
+                                  //发异步，把数据提交给php
+                                  layer.alert("删除成功", {
+                                          icon: 6
+                                      },
+                                      function() {
+                                          //刷新当前frame
+                                          location.reload()
+                                          //xadmin.reload();
+                                      });
+                              }else  {
+                                  alert("请检查后台服务器");
+                              }
+                          },
+                          error:function (arg) {
+                              layer.alert("删除失败！");
+                          }
+                      });
+                      obj.del();
+                      layer.close(index);
+                  });
+              }else if(obj.event === 'changepwd'){
+                  layui.sessionData('userEditData',{
+                      key:'data',
+                      value:data
+                  })
+                  xadmin.open('修改密码','../member-changepwd.html',600,400)
+                  layer.msg('修改密码'+ data.userName);
+              }
+          });
+          //获取批量选择的数据
+              var $ = layui.$, active = {
+                  //执行批量删除
+                  getCheckData: function(){ //获取选中数据
+                      var checkStatus = table.checkStatus('userTable')
+                          ,data = checkStatus.data;
+                      if(checkStatus.data.length==0){
+                          parent.layer.msg('请先选择要删除的数据行！', {icon: 2});
+                          return ;
+                      }
+                      else{
+                          layer.confirm('真的删除吗？', function(index){
+                              //执行删除
+                              parent.layer.msg('删除中...', {icon: 16,shade: 0.3,time:500});
+                              for(var i=0;i<data.length;i++){
+                                  $.ajax({
+                                      url: "http://127.0.0.1:8080/delUserById?userId="+data[i].userId,
+                                      dataType: "json",
+                                      async:true,
+                                      type: "post",
+                                      contentType:"application/json;charset=UTF-8",
+                                      /*
+                                      data:JSON.stringify({
+
+                                      }),*/
+                                      success:function (data) {
+                                          if (data.msg=='OK') {
+                                              console.log(data);
+                                              //发异步，把数据提交给php
+                                              layer.alert("删除成功", {
+                                                      icon: 6
+                                                  },
+                                                  function() {
+                                                      //刷新当前frame
+                                                      location.reload()
+                                                      //xadmin.reload();
+                                                  });
+                                          }else  {
+                                              alert("请检查后台服务器");
+                                          }
+                                      },
+                                      error:function (arg) {
+                                          layer.alert("删除失败！");
+                                      }
+                                  });
+                              }
+                          })
+
+                      }
+
+                      //layer.alert(data);
+                  }
+                  ,getCheckLength: function(){ //获取选中数目
+                      var checkStatus = table.checkStatus('userTable')
+                          ,data = checkStatus.data;
+                      layer.msg('选中了：'+ data.length + ' 个');
+                  }
+                  ,isAll: function(){ //验证是否全选
+                      var checkStatus = table.checkStatus('idTest');
+                      layer.msg(checkStatus.isAll ? '全选': '未全选')
+                  }
+              };
+          $('.demoTable .layui-btn').on('click', function(){
+              var type = $(this).data('type');
+              active[type] ? active[type].call(this) : '';
+          });
+
+
+      });
+
+      /*用户-删除*/
+      function member_del(obj,id){
+          layer.confirm('确认要删除吗？',function(index){
+              //发异步删除数据
+              $(obj).parents("tr").remove();
+              layer.msg('已删除!',{icon:1,time:1000});
+          });
+      }
+
+
+    </script>
+</html>

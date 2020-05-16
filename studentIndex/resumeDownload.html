@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+
+<head>
+    <meta charset="UTF-8">
+    <title>简历上传与下载</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="stylesheet" href="../css/font.css">
+    <link rel="stylesheet" href="../css/xadmin.css">
+    <script type="text/javascript" src="../lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="../js/xadmin.js"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="layui-fluid">
+    <div class="layui-row">
+        <form class="layui-form" >
+            <div class="layui-form-item">
+                <!--<button type="button" class="layui-btn" id="downloadresume" onclick="">简历下载</button>-->
+                <a style="color: #1E9FFF;font-size: 30px" id="downloadresume" onclick="">下载</a>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+
+    layui.use(['form', 'layer','jquery' , 'layedit', 'laydate','upload','element'],
+        function() {
+            $ = layui.jquery;
+            var form = layui.form,
+                layer = layui.layer,
+                laydate = layui.laydate,
+                upload = layui.upload,
+                element = layui.element;
+            //触发事件
+
+            var userData = layui.sessionData("userData").data;
+            var userId = userData.userId;
+            $.ajax({
+                url: "http://127.0.0.1:8080/getResumesByUserId?userId="+userId,
+                dataType: "json",
+                async:true,
+                type: "get",
+                contentType:"application/json;charset=UTF-8",
+                success:function (data) {
+                    if (data.msg=='OK') {
+                        $('#downloadresume').attr('href','http://127.0.0.1:8080/file/'+data.data.resumePath);
+                    }else  {
+                        layer.alert("请先上传简历！");
+                    }
+                },
+                error:function (arg) {
+                    layer.alert("获取简历信息失败！");
+                }
+
+            });
+
+        });</script>
+</body>
+
+</html>

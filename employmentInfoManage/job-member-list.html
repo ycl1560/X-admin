@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+    <head>
+        <meta charset="UTF-8">
+        <title>职位管理</title>
+        <meta name="renderer" content="webkit">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+        <link rel="stylesheet" href="../css/font.css">
+        <link rel="stylesheet" href="../css/xadmin.css">
+        <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+        <script src="../lib/layui/layui.js" charset="utf-8"></script>
+        <script type="text/javascript" src="../js/xadmin.js"></script>
+        <!--[if lt IE 9]>
+          <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+          <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+    </head>
+    <body>
+        <div class="x-nav">
+          <span class="layui-breadcrumb">
+              <a><cite>导航元素</cite></a>
+          </span>
+          <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" onclick="location.reload()" title="刷新">
+            <i class="layui-icon layui-icon-refresh" style="line-height:30px"></i></a>
+        </div>
+        <div class="layui-fluid">
+            <div class="layui-row layui-col-space15">
+                <div class="layui-col-md12">
+                    <div class="layui-card">
+                        <div class="layui-card-body ">
+                            <form class="layui-form layui-col-space5">
+                                <div class="layui-inline layui-show-xs-block">
+                                    <input type="text" name="jobName" id="jobName"  placeholder="请输入职位名称" autocomplete="off" class="layui-input">
+                                </div>
+                                <div class="layui-inline layui-show-xs-block">
+                                    <input type="text" name="unitName" id="unitName"  placeholder="请输入单位名称" autocomplete="off" class="layui-input">
+                                </div>
+
+                                <div class="layui-inline layui-show-xs-block">
+                                    <button class="layui-btn"  lay-submit="" lay-filter="sreach"><i class="layui-icon">&#xe615;</i></button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="layui-card-header demoTable">
+                            <button class="layui-btn layui-btn-danger" data-type="getCheckData"><i class="layui-icon"></i>批量删除</button>
+                            <button class="layui-btn layui-btn-normal" data-type="getCheckLength"><i class="layui-icon"></i>获取选中数目</button>
+                        </div>
+                        <div class="layui-card-body layui-table-body layui-table-main">
+                            <table class="layui-table layui-form" id="userTable" lay-filter="userTable">
+
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="layui-footer" style="background-color: #3C6ABD;height: 150px;color: white;font-size: 15px;text-align: center">
+            <div class="layui-main">
+                <div class="site-union">
+                    <p class="site-union-desc">
+                        <span>
+                          联系我们：<a style="color: white">15454545454</a>
+                        </span>
+                    </p>
+                </div>
+
+                <div class="site-union">
+                    <p class="site-union-desc">
+                        <span>
+                          地址：<a style="color: white">贵州省毕节市七星关区学院路贵州工程应用技术学院大学生就业指导中心</a>
+                        </span>
+                    </p>
+                </div>
+
+                <div class="site-union">
+                    <p class="site-union-desc">
+                        <span>
+                          邮编：<a style="color: white">551700</a>
+                        </span>
+                    </p>
+                </div>
+                <div class="site-union">
+                    <p class="site-union-desc">
+                        <span>
+                          就业咨询电话：<a style="color: white">0857-8330279</a>
+                        </span>
+                    </p>
+                </div>
+                <div class="site-union">
+                    <p class="site-union-desc">
+                        <span>
+                          版权所有：<a style="color: white">贵州工程应用技术学院</a>
+                        </span>
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+    </body>
+    <script type="text/html" id="bar">
+        <button class="layui-btn layui-btn-normal" lay-event="edit">编辑</button>
+        <button class="layui-btn layui-btn-danger"lay-event="delete">删除</button>
+    </script>
+    <script>
+      layui.use('table', function(){
+        var laydate = layui.laydate;
+        var  form = layui.form;
+          var table = layui.table;
+          var userData = layui.sessionData('userData');
+          if(jQuery.isEmptyObject(userData)){
+              alert("请先登录！")
+              window.location="../login.html";
+          }
+          //生成表单
+          table.render({
+              elem: '#userTable'
+              ,height: 500
+              ,url: 'http://127.0.0.1:8080/getAllJob' //数据接口
+              ,page: true //开启分页
+              ,limits: [5,10,20,50,100]
+              ,limit: 10 //每页默认显示的数量
+              ,response: {
+                  statusCode: 200//规定成功的状态码，默认：0
+                  ,msgName: 'msg' //规定状态信息的字段名称，默认：msg
+                  ,countName: 'count' //规定数据总数的字段名称，默认：count
+                  ,dataName: 'data' //规定数据列表的字段名称，默认：data
+              }
+              ,parseData:function (res) {
+                  return{
+                      "code": res.status, //解析接口状态
+                      "msg": res.message, //解析提示文本
+                      "count": res.count, //解析数据长度
+                      "data": res.data //解析数据列表
+                  };
+              }
+              ,cols: [[ //表头
+                  {field: 'jobId', title: 'ID', width:100, sort: true, fixed: 'left',type:'checkbox'}
+                  ,{field: 'jobDetail', title: 'ID', width:100, sort: true, fixed: 'left',hide:true}
+                  ,{field: 'jobType', title: '职位类型', width:100,style:'background-color: #009688; color: #fff;',sort:true,fixed:"left"}
+                  ,{field: 'jobName', title: '职位名称', width:130 }
+                  ,{field: 'jobYears', title: '工作年限', width:100,hide:true }
+                  ,{field: 'jobMajor', title: '专业要求', width:100 }
+                  ,{field: 'unitName', title: '发布单位', width:100 }
+                  ,{field: 'age', title: '年龄要求', width:100}
+                  ,{field: 'jobSex', title: '性别要求', width:80}
+                  ,{field: 'academicQualifications', title: '学历要求', width:130}
+                  ,{field: 'monthlySalary', title: '月薪', width: 100,sort:true}
+                  ,{field: 'recruitsNumber', title: '招聘人数', width: 100,sort:true}
+                  ,{field: 'updateTime', title: '更新时间', width: 180,sort:true}
+                  ,{field: 'createTime', title: '创建时间', width: 180,sort:true}
+                  ,{title: '操作', width: 150,toolbar:"#bar"}
+              ]]
+          });
+          //监听查询按钮提交
+          form.on('submit(sreach)',
+              function(data) {
+                  var jobName = $("#jobName").val()
+                  var unitName = $("#unitName").val()
+                 /* console.log("姓名"+name)
+                  console.log("学号"+sno)
+                  console.log("用户名"+userName)*/
+                  table.reload('userTable', {
+                      url: 'http://127.0.0.1:8080/getJobByJobNameOrUnitNameOrUserId' //数据接口
+                      ,where:{
+                          jobName:jobName,
+                          unitName:unitName,
+                          userId:"",
+                      }
+                      ,page: {
+                          curr: 1 //重新从第 1 页开始
+                      }
+                  }); //只重载数据
+
+                  return false;
+              });
+          //工具栏中编辑删除按钮监听
+          table.on('tool(userTable)', function(obj){
+              var data = obj.data;
+              if(obj.event === 'edit'){
+                  layui.sessionData('employmentInfoEditData',{
+                      key:'data',
+                      value:data
+                  })
+                  xadmin.open('编辑职位','./member-edit.html',600,400)
+                  layer.msg('编辑职位'+ data.jobName);
+              } else if(obj.event === 'delete'){
+                  layer.confirm('真的删除职位吗？', function(index){
+                      $.ajax({
+                          url: "http://127.0.0.1:8080/delJobByJobId?jobId="+data.jobId,
+                          dataType: "json",
+                          async:true,
+                          type: "post",
+                          contentType:"application/json;charset=UTF-8",
+                          /*
+                          data:JSON.stringify({
+
+                          }),*/
+                          success:function (data) {
+                              if (data.msg=='OK') {
+                                  console.log(data);
+                                  //发异步，把数据提交给php
+                                  layer.alert("删除成功", {
+                                          icon: 6
+                                      },
+                                      function() {
+                                          //刷新当前frame
+                                          location.reload()
+                                          //xadmin.reload();
+                                      });
+                              }else  {
+                                  alert("请检查后台服务器");
+                              }
+                          },
+                          error:function (arg) {
+                              layer.alert("删除失败！");
+                          }
+                      });
+                      obj.del();
+                      layer.close(index);
+                  });
+              }
+          });
+          //获取批量选择的数据
+              var $ = layui.$, active = {
+                  //执行批量删除
+                  getCheckData: function(){ //获取选中数据
+                      var checkStatus = table.checkStatus('userTable')
+                          ,data = checkStatus.data;
+                      if(checkStatus.data.length==0){
+                          parent.layer.msg('请先选择要删除的数据行！', {icon: 2});
+                          return ;
+                      }
+                      else{
+                          //执行删除
+                          parent.layer.msg('删除中...', {icon: 16,shade: 0.3,time:500});
+                          for(var i=0;i<data.length;i++){
+                              $.ajax({
+                                  url: "http://127.0.0.1:8080/delJobByJobId?jobId="+data[i].jobId,
+                                  dataType: "json",
+                                  async:true,
+                                  type: "post",
+                                  contentType:"application/json;charset=UTF-8",
+                                  /*
+                                  data:JSON.stringify({
+
+                                  }),*/
+                                  success:function (data) {
+                                      if (data.msg=='OK') {
+                                          console.log(data);
+                                          //发异步，把数据提交给php
+                                          layer.alert("删除成功", {
+                                                  icon: 6
+                                              },
+                                              function() {
+                                                  //刷新当前frame
+                                                  location.reload()
+                                                  //xadmin.reload();
+                                              });
+                                      }else  {
+                                          alert("请检查后台服务器");
+                                      }
+                                  },
+                                  error:function (arg) {
+                                      layer.alert("删除失败！");
+                                  }
+                              });
+                          }
+                          console.log(data)
+                      }
+
+                      //layer.alert(data);
+                  }
+                  ,getCheckLength: function(){ //获取选中数目
+                      var checkStatus = table.checkStatus('userTable')
+                          ,data = checkStatus.data;
+                      layer.msg('选中了：'+ data.length + ' 个');
+                  }
+                  ,isAll: function(){ //验证是否全选
+                      var checkStatus = table.checkStatus('idTest');
+                      layer.msg(checkStatus.isAll ? '全选': '未全选')
+                  }
+              };
+          $('.demoTable .layui-btn').on('click', function(){
+              var type = $(this).data('type');
+              active[type] ? active[type].call(this) : '';
+          });
+/*          function delAll(){
+              var checkStatus = table.checkStatus('userTable');
+              if(checkStatus.data.length==0){
+                  parent.layer.msg('请先选择要删除的数据行！', {icon: 2});
+                  return ;
+              }
+              console.log(checkStatus.data[i].id+",")
+               var ids = "";
+               for(var i=0;i<checkStatus.data.length;i++){
+                   ids += checkStatus.data[i].id+",";
+               }
+               parent.layer.msg('删除中...', {icon: 16,shade: 0.3,time:5000});
+               $.post('url',
+                   {'ids':ids},
+                   function(data){
+                       layer.closeAll('loading');
+                       if(data.code==1){
+                           parent.layer.msg('删除成功！', {icon: 1,time:2000,shade:0.2});
+                           location.reload(true);
+                       }else{
+                           parent.layer.msg('删除失败！', {icon: 2,time:3000,shade:0.2});
+                       }
+                   }
+               );
+          }*/
+
+        /*
+              // 监听全选
+              form.on('checkbox(checkall)', function(data){
+                  if(data.elem.checked){
+                      $('tbody input').prop('checked',true);
+                  }else{
+                      $('tbody input').prop('checked',false);
+                  }
+                  form.render('checkbox');
+              });
+       */
+
+
+      /*  //执行一个laydate实例
+        laydate.render({
+          elem: '#start' //指定元素
+        });
+
+        //执行一个laydate实例
+        laydate.render({
+          elem: '#end' //指定元素
+        });*/
+
+
+      });
+
+       /*用户-停用*/
+    /*  function member_stop(obj,id){
+          layer.confirm('确认要停用吗？',function(index){
+
+              if($(obj).attr('title')=='启用'){
+
+                //发异步把用户状态进行更改
+                $(obj).attr('title','停用')
+                $(obj).find('i').html('&#xe62f;');
+
+                $(obj).parents("tr").find(".td-status").find('span').addClass('layui-btn-disabled').html('已停用');
+                layer.msg('已停用!',{icon: 5,time:1000});
+
+              }else{
+                $(obj).attr('title','启用')
+                $(obj).find('i').html('&#xe601;');
+
+                $(obj).parents("tr").find(".td-status").find('span').removeClass('layui-btn-disabled').html('已启用');
+                layer.msg('已启用!',{icon: 5,time:1000});
+              }
+              
+          });
+      }*/
+
+      /*用户-删除*/
+      function member_del(obj,id){
+          layer.confirm('确认要删除吗？',function(index){
+              //发异步删除数据
+              $(obj).parents("tr").remove();
+              layer.msg('已删除!',{icon:1,time:1000});
+          });
+      }
+
+
+
+    /*  function delAll (argument) {
+        var ids = [];
+
+        // 获取选中的id 
+        $('tbody input').each(function(index, el) {
+            if($(this).prop('checked')){
+               ids.push($(this).val())
+            }
+        });
+  
+        layer.confirm('确认要删除吗？'+ids.toString(),function(index){
+            //捉到所有被选中的，发异步进行删除
+            layer.msg('删除成功', {icon: 1});
+            $(".layui-form-checked").not('.header').parents('tr').remove();
+        });
+      }*/
+    </script>
+</html>
