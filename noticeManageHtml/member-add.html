@@ -38,7 +38,7 @@
                     <div class="layui-form-item layui-form-text">
                         <label class="layui-form-label">公告详情</label>
                         <div class="layui-input-block">
-                            <textarea placeholder="请输入内容" class="layui-textarea"  id="detail" name="detail"></textarea>
+                            <textarea placeholder="请输入内容" class="layui-textarea"  id="detail" name="detail" style="display: none"></textarea>
                         </div>
                     </div>
 
@@ -49,12 +49,23 @@
             </div>
         </div>
         <script>
-            layui.use(['form', 'layer','jquery'],
+            layui.use(['form', 'layer','jquery','layedit'],
             function() {
                 $ = layui.jquery;
                 var form = layui.form,
-                layer = layui.layer;
+                layer = layui.layer,
+                    layedit = layui.layedit;
                 var userData = layui.sessionData('userData');
+                layedit.set({
+                    uploadImage: {
+                        url: 'http://127.0.0.1:8080/uploadNoticeImg' //接口url
+                        ,type: 'post' //默认post
+                    }
+                });
+                var index = layedit.build('detail',{
+                    height: 400
+                }); //建立编辑器
+                //编辑器外部操作
                 if($.isEmptyObject(userData)){
                     alert("请先登录！")
                     window.location="../login.html";
@@ -71,7 +82,8 @@
                 form.on('submit(add)',
                 function(data) {
                     noticeName = $("#noticename").val()
-                    noticeDetail = $("#detail").val()
+                   // noticeDetail = $("#detail").val()
+                    noticeDetail =layedit.getContent(index)
                     $.ajax({
                         url: "http://127.0.0.1:8080/addNotice",
                         dataType: "json",

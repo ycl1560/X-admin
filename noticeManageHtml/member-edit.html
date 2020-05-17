@@ -31,7 +31,7 @@
             <div class="layui-form-item layui-form-text">
                 <label class="layui-form-label">公告内容</label>
                 <div class="layui-input-block">
-                    <textarea placeholder="请输入内容" class="layui-textarea"  id="detail" name="detail"></textarea>
+                    <textarea placeholder="请输入内容" class="layui-textarea"  id="detail" name="detail" style="display: none"></textarea>
                 </div>
             </div>
             <div class="layui-form-item">
@@ -41,20 +41,33 @@
     </div>
 </div>
 <script>
-    layui.use(['form', 'layer','jquery'],
+    layui.use(['form', 'layer','jquery','layedit'],
         function() {
             $ = layui.jquery;
             var form = layui.form,
-                layer = layui.layer;
+                layer = layui.layer,
+                layedit = layui.layedit;
+            var noticeEditData = layui.sessionData("noticeEditData").data;
+            var noticename = noticeEditData.noticeName;
+            var detail = noticeEditData.noticeDetail;
             var userData = layui.sessionData('userData');
+            $("#detail").val(detail)
+            layedit.set({
+                uploadImage: {
+                    url: 'http://127.0.0.1:8080/uploadNoticeImg' //接口url
+                    ,type: 'post' //默认post
+                }
+            });
+            var index = layedit.build('detail',{
+                height: 400
+            }); //建立编辑器
             if($.isEmptyObject(userData)){
                 alert("请先登录！")
                 window.location="../login.html";
             }
             //列表页传过来的用户信息
-            var noticeEditData = layui.sessionData("noticeEditData").data;
-            var noticename = noticeEditData.noticeName;
-            var detail = noticeEditData.noticeDetail;
+
+            console.log(detail)
             var type = noticeEditData.type;
             if(type=="学校公告"){
                 type=1
@@ -64,7 +77,6 @@
             }
             var noticeId = noticeEditData.noticeId;
             $("#noticename").val(noticename)
-            $("#detail").val(detail)
             //监听提交
             form.on('submit(add)',
                 function(data) {

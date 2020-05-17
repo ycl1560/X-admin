@@ -38,7 +38,7 @@
                         <div class="layui-card-header demoTable">
                             <button class="layui-btn layui-btn-danger" data-type="getCheckData"><i class="layui-icon"></i>批量删除</button>
                             <button class="layui-btn layui-btn-normal" data-type="getCheckLength"><i class="layui-icon"></i>获取选中数目</button>
-                            <button class="layui-btn" onclick="xadmin.open('添加公告','./member-add.html',600,400)"><i class="layui-icon"></i>添加</button>
+                            <button class="layui-btn" onclick="xadmin.open('添加公告','./member-add.html',1000,700)"><i class="layui-icon"></i>添加</button>
                         </div>
                         <div class="layui-card-body layui-table-body layui-table-main">
                             <table class="layui-table layui-form" id="userTable" lay-filter="userTable">
@@ -120,7 +120,7 @@
                       key:'data',
                       value:data
                   })
-                  xadmin.open('编辑通知公告','./member-edit.html',600,400)
+                  xadmin.open('编辑通知公告','./member-edit.html',1000,700)
                   layer.msg('编辑通知公告'+ data.noticeName);
               } else if(obj.event === 'delete'){
                   layer.confirm('真的删除吗？', function(index){

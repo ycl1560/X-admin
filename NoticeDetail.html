@@ -58,7 +58,9 @@
         console.log(data)
         $("#noticename").text(data.noticeName)
         $("#createTime").text(data.createTime)
-        $("#noticeDetail").text(data.noticeDetail)
+        var html=data.noticeDetail;
+        $("#noticeDetail").html(html);
+       // $("#noticeDetail").text(data.noticeDetail)
     });
 
 </script>
