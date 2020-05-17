@@ -76,28 +76,7 @@
                 layer = layui.layer;
             //所有专业的数据
             var userData = layui.sessionData('userData').data;
-   /*         //登陆的用户信息
-            $.ajax({
-                url: "http://127.0.0.1:8080/getTeacherUserByInfo?userId="+userData.userId,
-                dataType: "json",
-                async:true,
-                type: "get",
-                contentType:"application/json;charset=UTF-8",
-                success:function (data) {
-                    if (data.msg=='OK') {
-                        layui.sessionData('userEditData',{
-                            key:'data',
-                            value:data.data
-                        });
-                    }else  {
-                        alert("请检查后台服务器");
-                    }
-                },
-                error:function (arg) {
-                    layer.alert("查看失败！");
-                }
-            });*/
-            var userEditData = layui.sessionData('userEditData').data[0];
+            var userEditData = layui.sessionData('userData').data[0];
             console.log(userEditData)
             var userId = userEditData.userId;
             var userName = userEditData.userName;
